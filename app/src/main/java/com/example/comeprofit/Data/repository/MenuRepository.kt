@@ -186,7 +186,7 @@ class MenuRepository @Inject constructor() {
             ),
             MenuItem(
                 id = "25",
-                name = "Banana Bites",
+                name = "Banana Bitess",
                 price = 45000,
                 image = R.drawable.nasi_goreng_spesial,
                 category = "Light Bites"
