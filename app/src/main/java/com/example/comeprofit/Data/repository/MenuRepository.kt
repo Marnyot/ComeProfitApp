@@ -18,31 +18,31 @@ class MenuRepository @Inject constructor() {
         return listOf(
             MenuItem(
                 id = "1",
-                name = "Nasi Goreng Spesial",
-                price = 35000,
+                name = "Nasi Goreng ",
+                price = 60000,
                 image = R.drawable.nasi_goreng_spesial,
-                category = "Nasi"
+                category = "Fried Rice"
             ),
             MenuItem(
                 id = "2",
-                name = "Nasi Ayam Penyet",
-                price = 32000,
+                name = "Nasi Goreng Babat",
+                price = 55000,
                 image = R.drawable.nasi_goreng_spesial,
-                category = "Nasi"
+                category = "Fried Rice"
             ),
             MenuItem(
                 id = "3",
-                name = "Nasi Uduk",
-                price = 25000,
+                name = "Nasi Goreng Lap Cheong Halal",
+                price = 58000,
                 image = R.drawable.nasi_goreng_spesial,
-                category = "Nasi"
+                category = "Fried Rice"
             ),
             MenuItem(
                 id = "4",
-                name = "Mie Goreng",
-                price = 28000,
+                name = "Nasi Goreng Buntut",
+                price = 150000,
                 image = R.drawable.nasi_goreng_spesial,
-                category = "Mie"
+                category = "Fried Rice"
             ),
             MenuItem(
                 id = "5",
