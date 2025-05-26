@@ -127,6 +127,69 @@ class MenuRepository @Inject constructor() {
                 price = 235000,
                 image = R.drawable.nasi_goreng_spesial,
                 category = "Main Course"
+            ),
+            MenuItem(
+                id = "17",
+                name = "Sirloin Steak",
+                price = 250000,
+                image = R.drawable.nasi_goreng_spesial,
+                category = "Main Course"
+            ),
+            MenuItem(
+                id = "18",
+                name = "Crab Rangoon",
+                price = 48000,
+                image = R.drawable.nasi_goreng_spesial,
+                category = "Light Bites"
+            ),
+            MenuItem(
+                id = "19",
+                name = "Chicken In A Basket",
+                price = 58000,
+                image = R.drawable.nasi_goreng_spesial,
+                category = "Light Bites"
+            ),
+            MenuItem(
+                id = "20",
+                name = "Tahu Kriuk",
+                price = 34000,
+                image = R.drawable.nasi_goreng_spesial,
+                category = "Light Bites"
+            ),
+            MenuItem(
+                id = "21",
+                name = "Tahu Kipas",
+                price = 46000,
+                image = R.drawable.nasi_goreng_spesial,
+                category = "Light Bites"
+            ),
+            MenuItem(
+                id = "22",
+                name = "Paru Crispy",
+                price = 48000,
+                image = R.drawable.nasi_goreng_spesial,
+                category = "Light Bites"
+            ),
+            MenuItem(
+                id = "23",
+                name = "Mini Wonton",
+                price = 38000,
+                image = R.drawable.nasi_goreng_spesial,
+                category = "Light Bites"
+            ),
+            MenuItem(
+                id = "24",
+                name = "Tahu Mercon",
+                price = 40000,
+                image = R.drawable.nasi_goreng_spesial,
+                category = "Light Bites"
+            ),
+            MenuItem(
+                id = "25",
+                name = "Banana Bites",
+                price = 45000,
+                image = R.drawable.nasi_goreng_spesial,
+                category = "Light Bites"
             )
         )
     }
