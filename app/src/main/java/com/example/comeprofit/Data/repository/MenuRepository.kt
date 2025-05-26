@@ -18,7 +18,7 @@ class MenuRepository @Inject constructor() {
         return listOf(
             MenuItem(
                 id = "1",
-                name = "Nasi Goreng ",
+                name = "Nasi Goreng Seafood",
                 price = 60000,
                 image = R.drawable.nasi_goreng_spesial,
                 category = "Fried Rice"
@@ -46,31 +46,87 @@ class MenuRepository @Inject constructor() {
             ),
             MenuItem(
                 id = "5",
-                name = "Mie Ayam",
-                price = 30000,
+                name = "Carbonara",
+                price = 66000,
                 image = R.drawable.nasi_goreng_spesial,
-                category = "Mie"
+                category = "Spaghetti"
             ),
             MenuItem(
                 id = "6",
-                name = "Kwetiau Goreng",
-                price = 32000,
+                name = "Gamberetti",
+                price = 66000,
                 image = R.drawable.nasi_goreng_spesial,
-                category = "Mie"
+                category = "Spaghetti"
             ),
             MenuItem(
                 id = "7",
-                name = "Ayam Bakar",
-                price = 40000,
+                name = "Salmon with Cherry Tomato",
+                price = 66000,
                 image = R.drawable.nasi_goreng_spesial,
-                category = "Ayam"
+                category = "Spaghetti"
             ),
             MenuItem(
                 id = "8",
-                name = "Ayam Goreng",
-                price = 38000,
+                name = "Bolognese",
+                price = 66000,
                 image = R.drawable.nasi_goreng_spesial,
-                category = "Ayam"
+                category = "Spaghetti"
+            ),
+            MenuItem(
+                id = "9",
+                name = "Fish & Chips",
+                price = 60000,
+                image = R.drawable.nasi_goreng_spesial,
+                category = "Kids Meal"
+            ),
+            MenuItem(
+                id = "10",
+                name = "Chicken Parmigiana",
+                price = 65000,
+                image = R.drawable.nasi_goreng_spesial,
+                category = "Kids Meal"
+            ),
+            MenuItem(
+                id = "11",
+                name = "Omelet",
+                price = 45000,
+                image = R.drawable.nasi_goreng_spesial,
+                category = "Kids Meal"
+            ),
+            MenuItem(
+                id = "12",
+                name = "Lidah Lombok Ijo",
+                price = 58000,
+                image = R.drawable.nasi_goreng_spesial,
+                category = "Main Course"
+            ),
+            MenuItem(
+                id = "13",
+                name = "Ayam Romansa",
+                price = 85000,
+                image = R.drawable.nasi_goreng_spesial,
+                category = "Main Course"
+            ),
+            MenuItem(
+                id = "14",
+                name = "Ayam Panggan Madu",
+                price = 85000,
+                image = R.drawable.nasi_goreng_spesial,
+                category = "Main Course"
+            ),
+            MenuItem(
+                id = "15",
+                name = "Soto Betawi",
+                price = 68000,
+                image = R.drawable.nasi_goreng_spesial,
+                category = "Main Course"
+            ),
+            MenuItem(
+                id = "16",
+                name = "Tenderloin Steak",
+                price = 235000,
+                image = R.drawable.nasi_goreng_spesial,
+                category = "Main Course"
             )
         )
     }
