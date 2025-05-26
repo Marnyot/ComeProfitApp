@@ -281,7 +281,7 @@ fun CategoryFilters(
     selectedCategory: String?,
     onCategorySelected: (String?) -> Unit
 ) {
-    val categories = listOf("Semua", "Nasi", "Mie", "Ayam", "Seafood", "Snack", "Dessert")
+    val categories = listOf("Semua", "Main Course", "Light Bites", "Salad", "Fried Rice", "Spaghetti", "Kids Meal", "Rice", "Coffee", "Tea" , "Juice", "Dairy", "Non Dairy")
 
     LazyRow(
         horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -297,7 +297,6 @@ fun CategoryFilters(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MenuItemCard(
     menuItem: MenuItem,
@@ -317,7 +316,6 @@ fun MenuItemCard(
         modifier = modifier.fillMaxWidth()
     ) {
         Column {
-            // Image with gradient overlay
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
