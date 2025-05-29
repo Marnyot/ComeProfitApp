@@ -7,8 +7,11 @@ import com.example.comeprofit.data.model.MenuItem
 import com.example.comeprofit.data.repository.MenuRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -35,6 +38,21 @@ class MenuViewModel @Inject constructor(
     private val _cartItemCount = MutableStateFlow(0)
     val cartItemCount: StateFlow<Int> = _cartItemCount.asStateFlow()
 
+    val filteredMenuItems: StateFlow<List<MenuItem>> = combine(
+        _menuItems,
+        _selectedCategory
+    ) { items, category ->
+        if (category == null || category == "Semua") {
+            items
+        } else {
+            items.filter { it.category == category }
+        }
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000),
+        initialValue = emptyList()
+    )
+
     init {
         loadMenuItems()
     }
@@ -53,11 +71,9 @@ class MenuViewModel @Inject constructor(
             val existingItem = currentCartItems.find { it.menuItem.id == menuItem.id }
 
             if (existingItem != null) {
-                // Update quantity if item already exists in cart
                 val index = currentCartItems.indexOf(existingItem)
                 currentCartItems[index] = existingItem.copy(quantity = existingItem.quantity + 1)
             } else {
-                // Add new item to cart
                 currentCartItems.add(CartItem(menuItem, 1))
             }
 
@@ -71,11 +87,9 @@ class MenuViewModel @Inject constructor(
             val currentCartItems = _cartItems.value.toMutableList()
 
             if (cartItem.quantity > 1) {
-                // Decrease quantity if more than 1
                 val index = currentCartItems.indexOf(cartItem)
                 currentCartItems[index] = cartItem.copy(quantity = cartItem.quantity - 1)
             } else {
-                // Remove item from cart if quantity is 1
                 currentCartItems.remove(cartItem)
             }
 
@@ -84,13 +98,6 @@ class MenuViewModel @Inject constructor(
         }
     }
 
-    fun removeItemCompletely(cartItem: CartItem) {
-        viewModelScope.launch {
-            val currentCartItems = _cartItems.value.toMutableList()
-            currentCartItems.remove(cartItem)
-            _cartItems.value = currentCartItems
-        }
-    }
 
     fun clearCart() {
         viewModelScope.launch {
@@ -104,17 +111,12 @@ class MenuViewModel @Inject constructor(
     }
 
     fun getFilteredMenuItems(): List<MenuItem> {
-        val category = _selectedCategory.value
-        return if (category == null || category == "Semua") {
-            _menuItems.value
-        } else {
-            _menuItems.value.filter { it.category == category }
-        }
+        return filteredMenuItems.value
     }
 
     private fun updateCartTotals() {
         val items = _cartItems.value
         _totalCartPrice.value = items.sumOf { it.menuItem.price * it.quantity }
-        _cartItemCount.value = items.size
+        _cartItemCount.value = items.sumOf { it.quantity }
     }
 }

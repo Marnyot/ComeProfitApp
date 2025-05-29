@@ -12,7 +12,6 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
 
-// Elegant color palette
 private val DarkColorScheme = darkColorScheme(
     primary = Color(0xFF9C6644),
     onPrimary = Color.White,

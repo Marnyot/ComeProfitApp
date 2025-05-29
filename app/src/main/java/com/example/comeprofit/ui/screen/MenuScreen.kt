@@ -62,7 +62,6 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -70,7 +69,6 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
-import coil.request.ImageRequest
 import com.example.comeprofit.R
 import com.example.comeprofit.data.model.MenuItem
 import com.example.comeprofit.ui.components.CategoryChip
@@ -93,6 +91,7 @@ fun MenuScreen(
     val cartItemCount by viewModel.cartItemCount.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
     val selectedCategory by viewModel.selectedCategory.collectAsState()
+    val filteredItems by viewModel.filteredMenuItems.collectAsState()
 
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
@@ -106,7 +105,6 @@ fun MenuScreen(
         }
     }
 
-    // Function to add item to cart with visual feedback
     fun addToCartWithFeedback(menuItem: MenuItem) {
         viewModel.addToCart(menuItem)
         scope.launch {
@@ -262,8 +260,10 @@ fun MenuScreen(
                         Spacer(modifier = Modifier.height(16.dp))
                     }
 
-                    val filteredItems = viewModel.getFilteredMenuItems()
-                    items(filteredItems) { menuItem ->
+                    items(
+                        items = filteredItems,
+                        key = { menuItem -> menuItem.id }
+                    ) { menuItem ->
                         MenuItemCard(
                             menuItem = menuItem,
                             onAddToCart = { addToCartWithFeedback(menuItem) },
@@ -281,13 +281,22 @@ fun CategoryFilters(
     selectedCategory: String?,
     onCategorySelected: (String?) -> Unit
 ) {
-    val categories = listOf("Semua", "Main Course", "Light Bites", "Salad", "Fried Rice", "Spaghetti", "Kids Meal", "Rice", "Coffee", "Tea" , "Juice", "Dairy", "Non Dairy")
+    val categories = remember {
+        listOf(
+            "Semua", "Main Course", "Light Bites", "Salad",
+            "Fried Rice", "Spaghetti", "Kids Meal", "Rice",
+            "Coffee", "Tea", "Juice", "Dairy", "Non Dairy"
+        )
+    }
 
     LazyRow(
         horizontalArrangement = Arrangement.spacedBy(8.dp),
         modifier = Modifier.padding(vertical = 8.dp)
     ) {
-        items(categories) { category ->
+        items(
+            items = categories,
+            key = { category -> category }
+        ) { category ->
             CategoryChip(
                 text = category,
                 isSelected = selectedCategory == category || (selectedCategory == null && category == "Semua"),
@@ -312,7 +321,7 @@ fun MenuItemCard(
         }
     }
 
-    KlikCard (
+    KlikCard(
         modifier = modifier.fillMaxWidth()
     ) {
         Column {
@@ -322,10 +331,7 @@ fun MenuItemCard(
                     .height(160.dp)
             ) {
                 AsyncImage(
-                    model = ImageRequest.Builder(LocalContext.current)
-                        .data(menuItem.image)
-                        .crossfade(true)
-                        .build(),
+                    model = menuItem.image, // Langsung menggunakan resource ID
                     contentDescription = menuItem.name,
                     modifier = Modifier.fillMaxSize(),
                     contentScale = ContentScale.Crop,
@@ -410,7 +416,6 @@ fun MenuItemCard(
 
                 Spacer(modifier = Modifier.width(8.dp))
 
-                // Disabled info button (visual only, no functionality)
                 Box(
                     modifier = Modifier
                         .size(36.dp)

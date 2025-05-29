@@ -8,7 +8,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import com.example.comeprofit.R
 
-// Custom font family
 val SFProDisplayFontFamily = FontFamily(
     Font(R.font.sf_pro_display_regular, FontWeight.Normal),
     Font(R.font.sf_pro_display_medium, FontWeight.Medium),
