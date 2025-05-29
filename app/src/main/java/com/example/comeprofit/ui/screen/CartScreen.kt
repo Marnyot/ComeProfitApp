@@ -84,32 +84,44 @@ fun CartScreen(
 
     var showClearCartDialog by remember { mutableStateOf(false) }
     var showCheckoutDialog by remember { mutableStateOf(false) }
-    var itemToRemove by remember { mutableStateOf<CartItem?>(null) }
+    var itemToRemove by remember { mutableStateOf<String?>(null) }
+    var itemNameToRemove by remember { mutableStateOf("") }
 
     // Dialog to confirm removing a specific item
-    itemToRemove?.let { item ->
+    itemToRemove?.let { menuItemId ->
         AlertDialog(
-            onDismissRequest = { itemToRemove = null },
+            onDismissRequest = {
+                itemToRemove = null
+                itemNameToRemove = ""
+            },
             title = { Text("Hapus Item") },
-            text = { Text("Hapus ${item.menuItem.name} dari keranjang?") },
+            text = { Text("Hapus $itemNameToRemove dari keranjang?") },
             confirmButton = {
                 Button(
                     onClick = {
-                        // Remove all of this item from cart
-                        repeat(item.quantity) {
-                            viewModel.removeFromCart(item)
+                        try {
+                            viewModel.removeItemCompletely(menuItemId)
+                            scope.launch {
+                                snackbarHostState.showSnackbar("$itemNameToRemove dihapus dari keranjang")
+                            }
+                        } catch (e: Exception) {
+                            scope.launch {
+                                snackbarHostState.showSnackbar("Gagal menghapus item")
+                            }
+                        } finally {
+                            itemToRemove = null
+                            itemNameToRemove = ""
                         }
-                        scope.launch {
-                            snackbarHostState.showSnackbar("${item.menuItem.name} dihapus dari keranjang")
-                        }
-                        itemToRemove = null
                     }
                 ) {
                     Text("Hapus")
                 }
             },
             dismissButton = {
-                TextButton(onClick = { itemToRemove = null }) {
+                TextButton(onClick = {
+                    itemToRemove = null
+                    itemNameToRemove = ""
+                }) {
                     Text("Batal")
                 }
             }
@@ -251,7 +263,10 @@ fun CartScreen(
                             cartItem = cartItem,
                             onIncreaseQuantity = { viewModel.addToCart(cartItem.menuItem) },
                             onDecreaseQuantity = { viewModel.removeFromCart(cartItem) },
-                            onRemove = { itemToRemove = cartItem }
+                            onRemove = {
+                                itemToRemove = cartItem.menuItem.id
+                                itemNameToRemove = cartItem.menuItem.name
+                            }
                         )
                     }
 

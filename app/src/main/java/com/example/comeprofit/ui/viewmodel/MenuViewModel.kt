@@ -67,42 +67,73 @@ class MenuViewModel @Inject constructor(
 
     fun addToCart(menuItem: MenuItem) {
         viewModelScope.launch {
-            val currentCartItems = _cartItems.value.toMutableList()
-            val existingItem = currentCartItems.find { it.menuItem.id == menuItem.id }
+            try {
+                val currentCartItems = _cartItems.value.toMutableList()
+                val existingItemIndex = currentCartItems.indexOfFirst { it.menuItem.id == menuItem.id }
 
-            if (existingItem != null) {
-                val index = currentCartItems.indexOf(existingItem)
-                currentCartItems[index] = existingItem.copy(quantity = existingItem.quantity + 1)
-            } else {
-                currentCartItems.add(CartItem(menuItem, 1))
+                if (existingItemIndex != -1) {
+                    val existingItem = currentCartItems[existingItemIndex]
+                    currentCartItems[existingItemIndex] = existingItem.copy(quantity = existingItem.quantity + 1)
+                } else {
+                    currentCartItems.add(CartItem(menuItem, 1))
+                }
+
+                _cartItems.value = currentCartItems
+                updateCartTotals()
+            } catch (e: Exception) {
+                println("Error adding to cart: ${e.message}")
             }
-
-            _cartItems.value = currentCartItems
-            updateCartTotals()
         }
     }
 
     fun removeFromCart(cartItem: CartItem) {
         viewModelScope.launch {
-            val currentCartItems = _cartItems.value.toMutableList()
+            try {
+                val currentCartItems = _cartItems.value.toMutableList()
+                val itemIndex = currentCartItems.indexOfFirst { it.menuItem.id == cartItem.menuItem.id }
 
-            if (cartItem.quantity > 1) {
-                val index = currentCartItems.indexOf(cartItem)
-                currentCartItems[index] = cartItem.copy(quantity = cartItem.quantity - 1)
-            } else {
-                currentCartItems.remove(cartItem)
+                if (itemIndex != -1) {
+                    val existingItem = currentCartItems[itemIndex]
+                    if (existingItem.quantity > 1) {
+                        currentCartItems[itemIndex] = existingItem.copy(quantity = existingItem.quantity - 1)
+                    } else {
+                        currentCartItems.removeAt(itemIndex)
+                    }
+
+                    _cartItems.value = currentCartItems
+                    updateCartTotals()
+                }
+            } catch (e: Exception) {
+                println("Error removing from cart: ${e.message}")
             }
-
-            _cartItems.value = currentCartItems
-            updateCartTotals()
         }
     }
 
+    fun removeItemCompletely(menuItemId: String) {
+        viewModelScope.launch {
+            try {
+                val currentCartItems = _cartItems.value.toMutableList()
+                val itemIndex = currentCartItems.indexOfFirst { it.menuItem.id == menuItemId }
+
+                if (itemIndex != -1) {
+                    currentCartItems.removeAt(itemIndex)
+                    _cartItems.value = currentCartItems
+                    updateCartTotals()
+                }
+            } catch (e: Exception) {
+                println("Error removing item completely: ${e.message}")
+            }
+        }
+    }
 
     fun clearCart() {
         viewModelScope.launch {
-            _cartItems.value = emptyList()
-            updateCartTotals()
+            try {
+                _cartItems.value = emptyList()
+                updateCartTotals()
+            } catch (e: Exception) {
+                println("Error clearing cart: ${e.message}")
+            }
         }
     }
 
@@ -115,8 +146,14 @@ class MenuViewModel @Inject constructor(
     }
 
     private fun updateCartTotals() {
-        val items = _cartItems.value
-        _totalCartPrice.value = items.sumOf { it.menuItem.price * it.quantity }
-        _cartItemCount.value = items.sumOf { it.quantity }
+        try {
+            val items = _cartItems.value
+            _totalCartPrice.value = items.sumOf { it.menuItem.price * it.quantity }
+            _cartItemCount.value = items.sumOf { it.quantity }
+        } catch (e: Exception) {
+            println("Error updating cart totals: ${e.message}")
+            _totalCartPrice.value = 0
+            _cartItemCount.value = 0
+        }
     }
 }
