@@ -331,7 +331,7 @@ fun MenuItemCard(
                     .height(160.dp)
             ) {
                 AsyncImage(
-                    model = menuItem.image, // Langsung menggunakan resource ID
+                    model = menuItem.image,
                     contentDescription = menuItem.name,
                     modifier = Modifier.fillMaxSize(),
                     contentScale = ContentScale.Crop,
