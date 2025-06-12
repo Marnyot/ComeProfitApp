@@ -10,6 +10,9 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -23,6 +26,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.comeprofit.R
 import com.example.comeprofit.ui.screen.CartScreen
 import com.example.comeprofit.ui.screen.MenuScreen
+import com.example.comeprofit.ui.screen.SplashScreen
 import com.example.comeprofit.ui.viewmodel.MenuViewModel
 
 sealed class Screen(val route: String, val resourceId: Int, val icon: Int) {
@@ -32,6 +36,21 @@ sealed class Screen(val route: String, val resourceId: Int, val icon: Int) {
 
 @Composable
 fun AppNavigation() {
+    var showSplash by remember { mutableStateOf(true) }
+
+    if (showSplash) {
+        SplashScreen(
+            onSplashFinished = {
+                showSplash = false
+            }
+        )
+    } else {
+        MainNavigation()
+    }
+}
+
+@Composable
+private fun MainNavigation() {
     val navController = rememberNavController()
     val viewModel: MenuViewModel = hiltViewModel()
     val items = listOf(Screen.Menu, Screen.Cart)
