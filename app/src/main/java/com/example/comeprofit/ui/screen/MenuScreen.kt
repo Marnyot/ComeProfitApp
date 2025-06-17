@@ -24,6 +24,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material3.Badge
@@ -41,6 +42,8 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
@@ -51,6 +54,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -89,7 +93,8 @@ fun MenuScreen(
     val isLoading by viewModel.isLoading.collectAsState()
     val selectedCategory by viewModel.selectedCategory.collectAsState()
     val filteredItems by viewModel.filteredMenuItems.collectAsState()
-
+    var isSearching by rememberSaveable { mutableStateOf(false) }
+    val searchQuery by viewModel.searchQuery.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
 
@@ -120,22 +125,51 @@ fun MenuScreen(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
             AnimatedVisibility(
-                visible = showTopBar,
+                visible = showTopBar || isSearching,
                 enter = fadeIn() + slideInVertically(),
                 exit = fadeOut()
             ) {
                 TopAppBar(
-                    title = { Text("ComeProfit") },
-                    colors = TopAppBarDefaults.topAppBarColors(
-                        containerColor = MaterialTheme.colorScheme.surface,
-                        titleContentColor = MaterialTheme.colorScheme.onSurface
-                    ),
-                    actions = {
-                        IconButton(onClick = { /* Search functionality */ }) {
-                            Icon(
-                                imageVector = Icons.Default.Search,
-                                contentDescription = "Search"
+                    title = {
+                        if (isSearching) {
+                            TextField(
+                                value = searchQuery,
+                                onValueChange = { viewModel.setSearchQuery(it) },
+                                placeholder = { Text("Cari menu...") },
+                                singleLine = true,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(end = 8.dp),
+                                colors = TextFieldDefaults.colors(
+                                    focusedContainerColor = Color.Transparent,
+                                    unfocusedContainerColor = Color.Transparent,
+                                    cursorColor = MaterialTheme.colorScheme.onBackground,
+                                    focusedIndicatorColor = Color.Transparent,
+                                    unfocusedIndicatorColor = Color.Transparent,
+                                    focusedTextColor = MaterialTheme.colorScheme.onBackground,
+                                    unfocusedTextColor = MaterialTheme.colorScheme.onBackground,
+                                    focusedPlaceholderColor = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f),
+                                    unfocusedPlaceholderColor = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f)
+                                )
                             )
+                        } else {
+                            Text("ComeProfit")
+                        }
+                    },
+                    actions = {
+                        if (isSearching) {
+                            IconButton(onClick = {
+                                isSearching = false
+                                viewModel.setSearchQuery("") // reset pencarian
+                            }) {
+                                Icon(Icons.Default.Close, contentDescription = "Tutup Pencarian")
+                            }
+                        } else {
+                            IconButton(onClick = {
+                                isSearching = true
+                            }) {
+                                Icon(Icons.Default.Search, contentDescription = "Cari")
+                            }
                         }
                     },
                     scrollBehavior = scrollBehavior

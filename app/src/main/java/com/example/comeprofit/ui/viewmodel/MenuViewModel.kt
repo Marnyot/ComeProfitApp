@@ -31,6 +31,11 @@ class MenuViewModel @Inject constructor(
 
     private val _selectedCategory = MutableStateFlow<String?>(null)
     val selectedCategory: StateFlow<String?> = _selectedCategory.asStateFlow()
+    private val _searchQuery = MutableStateFlow("")
+    val searchQuery: StateFlow<String> = _searchQuery.asStateFlow()
+    fun setSearchQuery(query: String) {
+        _searchQuery.value = query
+    }
 
     private val _totalCartPrice = MutableStateFlow(0)
     val totalCartPrice: StateFlow<Int> = _totalCartPrice.asStateFlow()
@@ -40,18 +45,19 @@ class MenuViewModel @Inject constructor(
 
     val filteredMenuItems: StateFlow<List<MenuItem>> = combine(
         _menuItems,
-        _selectedCategory
-    ) { items, category ->
-        if (category == null || category == "Semua") {
-            items
-        } else {
-            items.filter { it.category == category }
+        _selectedCategory,
+        _searchQuery
+    ) { items, category, query ->
+        items.filter { item ->
+            (category == null || category == "Semua" || item.category == category) &&
+                    (query.isBlank() || item.name.contains(query, ignoreCase = true))
         }
     }.stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(5000),
         initialValue = emptyList()
     )
+
 
     init {
         loadMenuItems()
