@@ -1,39 +1,34 @@
 package com.example.comeprofit.ui.navigation
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Icon
-import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationBarItem
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
-import androidx.navigation.compose.currentBackStackEntryAsState
-import androidx.navigation.compose.rememberNavController
+import androidx.navigation.compose.*
 import com.example.comeprofit.R
 import com.example.comeprofit.ui.screen.CartScreen
 import com.example.comeprofit.ui.screen.MenuScreen
 import com.example.comeprofit.ui.screen.SplashScreen
+import com.example.comeprofit.ui.screen.TransactionHistoryScreen
 import com.example.comeprofit.ui.viewmodel.MenuViewModel
 
 sealed class Screen(val route: String, val resourceId: Int, val icon: Int) {
     object Menu : Screen("menu", R.string.menu, R.drawable.ic_menu)
     object Cart : Screen("cart", R.string.cart, R.drawable.ic_cart)
+    object History : Screen("history", R.string.history, R.drawable.ic_history)
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun AppNavigation() {
     var showSplash by remember { mutableStateOf(true) }
@@ -49,11 +44,12 @@ fun AppNavigation() {
     }
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 private fun MainNavigation() {
     val navController = rememberNavController()
     val viewModel: MenuViewModel = hiltViewModel()
-    val items = listOf(Screen.Menu, Screen.Cart)
+    val items = listOf(Screen.Menu, Screen.Cart, Screen.History)
 
     Scaffold(
         bottomBar = {
@@ -62,6 +58,7 @@ private fun MainNavigation() {
                 val currentDestination = navBackStackEntry?.destination
 
                 items.forEach { screen ->
+                    val isSelected = currentDestination?.hierarchy?.any { it.route == screen.route } == true
                     NavigationBarItem(
                         icon = {
                             Icon(
@@ -70,7 +67,7 @@ private fun MainNavigation() {
                             )
                         },
                         label = { Text(stringResource(screen.resourceId)) },
-                        selected = currentDestination?.hierarchy?.any { it.route == screen.route } == true,
+                        selected = isSelected,
                         onClick = {
                             navController.navigate(screen.route) {
                                 popUpTo(navController.graph.findStartDestination().id) {
@@ -79,7 +76,14 @@ private fun MainNavigation() {
                                 launchSingleTop = true
                                 restoreState = true
                             }
-                        }
+                        },
+                        colors = NavigationBarItemDefaults.colors(
+                            selectedIconColor = Color(0xFF6B3E26),
+                            unselectedIconColor = Color.Gray,
+                            selectedTextColor = Color(0xFF6B3E26),
+                            unselectedTextColor = Color.Gray,
+                            indicatorColor = Color(0xFFFFE5D0)
+                        )
                     )
                 }
             }
@@ -124,6 +128,24 @@ private fun MainNavigation() {
                 }
             ) {
                 CartScreen(navController = navController, viewModel = viewModel)
+            }
+
+            composable(
+                route = Screen.History.route,
+                enterTransition = {
+                    slideIntoContainer(
+                        towards = AnimatedContentTransitionScope.SlideDirection.Left,
+                        animationSpec = tween(300)
+                    )
+                },
+                exitTransition = {
+                    slideOutOfContainer(
+                        towards = AnimatedContentTransitionScope.SlideDirection.Right,
+                        animationSpec = tween(300)
+                    )
+                }
+            ) {
+                TransactionHistoryScreen()
             }
         }
     }

@@ -160,7 +160,7 @@ fun MenuScreen(
                         if (isSearching) {
                             IconButton(onClick = {
                                 isSearching = false
-                                viewModel.setSearchQuery("") // reset pencarian
+                                viewModel.setSearchQuery("")
                             }) {
                                 Icon(Icons.Default.Close, contentDescription = "Tutup Pencarian")
                             }

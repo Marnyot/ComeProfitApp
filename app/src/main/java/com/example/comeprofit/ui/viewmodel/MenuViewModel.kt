@@ -1,5 +1,7 @@
 package com.example.comeprofit.ui.viewmodel
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.comeprofit.data.model.CartItem
@@ -162,4 +164,14 @@ class MenuViewModel @Inject constructor(
             _cartItemCount.value = 0
         }
     }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun checkout(transactionViewModel: TransactionViewModel) {
+        val itemsToBuy = _cartItems.value
+        val total = _totalCartPrice.value
+
+        transactionViewModel.createTransaction(itemsToBuy, total)
+        clearCart()
+    }
+
 }

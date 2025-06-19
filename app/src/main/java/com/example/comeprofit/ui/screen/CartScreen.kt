@@ -1,5 +1,7 @@
 package com.example.comeprofit.ui.screen
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -68,8 +70,10 @@ import com.example.comeprofit.ui.components.ElegantButton
 import com.example.comeprofit.ui.components.EmptyStateMessage
 import com.example.comeprofit.ui.components.SectionTitle
 import com.example.comeprofit.ui.viewmodel.MenuViewModel
+import com.example.comeprofit.ui.viewmodel.TransactionViewModel
 import kotlinx.coroutines.launch
 
+@RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CartScreen(
@@ -81,7 +85,7 @@ fun CartScreen(
     val itemCount by viewModel.cartItemCount.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
-
+    val transactionViewModel: TransactionViewModel = hiltViewModel()
     var showClearCartDialog by remember { mutableStateOf(false) }
     var showCheckoutDialog by remember { mutableStateOf(false) }
     var itemToRemove by remember { mutableStateOf<String?>(null) }
@@ -164,6 +168,10 @@ fun CartScreen(
             confirmButton = {
                 Button(
                     onClick = {
+                        transactionViewModel.createTransaction(
+                            items = cartItems,
+                            totalPrice = totalPrice
+                        )
                         viewModel.clearCart()
                         showCheckoutDialog = false
                         scope.launch {
