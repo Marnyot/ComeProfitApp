@@ -8,12 +8,7 @@ import com.example.comeprofit.data.model.CartItem
 import com.example.comeprofit.data.model.MenuItem
 import com.example.comeprofit.data.repository.MenuRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -33,8 +28,10 @@ class MenuViewModel @Inject constructor(
 
     private val _selectedCategory = MutableStateFlow<String?>(null)
     val selectedCategory: StateFlow<String?> = _selectedCategory.asStateFlow()
+
     private val _searchQuery = MutableStateFlow("")
     val searchQuery: StateFlow<String> = _searchQuery.asStateFlow()
+
     fun setSearchQuery(query: String) {
         _searchQuery.value = query
     }
@@ -60,7 +57,6 @@ class MenuViewModel @Inject constructor(
         initialValue = emptyList()
     )
 
-
     init {
         loadMenuItems()
     }
@@ -75,73 +71,57 @@ class MenuViewModel @Inject constructor(
 
     fun addToCart(menuItem: MenuItem) {
         viewModelScope.launch {
-            try {
-                val currentCartItems = _cartItems.value.toMutableList()
-                val existingItemIndex = currentCartItems.indexOfFirst { it.menuItem.id == menuItem.id }
+            val currentCartItems = _cartItems.value.toMutableList()
+            val existingItemIndex = currentCartItems.indexOfFirst { it.menuItem.id == menuItem.id }
 
-                if (existingItemIndex != -1) {
-                    val existingItem = currentCartItems[existingItemIndex]
-                    currentCartItems[existingItemIndex] = existingItem.copy(quantity = existingItem.quantity + 1)
-                } else {
-                    currentCartItems.add(CartItem(menuItem, 1))
-                }
-
-                _cartItems.value = currentCartItems
-                updateCartTotals()
-            } catch (e: Exception) {
-                println("Error adding to cart: ${e.message}")
+            if (existingItemIndex != -1) {
+                val existingItem = currentCartItems[existingItemIndex]
+                currentCartItems[existingItemIndex] = existingItem.copy(quantity = existingItem.quantity + 1)
+            } else {
+                currentCartItems.add(CartItem(menuItem = menuItem, quantity = 1))
             }
+
+            _cartItems.value = currentCartItems
+            updateCartTotals()
         }
     }
 
     fun removeFromCart(cartItem: CartItem) {
         viewModelScope.launch {
-            try {
-                val currentCartItems = _cartItems.value.toMutableList()
-                val itemIndex = currentCartItems.indexOfFirst { it.menuItem.id == cartItem.menuItem.id }
+            val currentCartItems = _cartItems.value.toMutableList()
+            val itemIndex = currentCartItems.indexOfFirst { it.menuItem.id == cartItem.menuItem.id }
 
-                if (itemIndex != -1) {
-                    val existingItem = currentCartItems[itemIndex]
-                    if (existingItem.quantity > 1) {
-                        currentCartItems[itemIndex] = existingItem.copy(quantity = existingItem.quantity - 1)
-                    } else {
-                        currentCartItems.removeAt(itemIndex)
-                    }
-
-                    _cartItems.value = currentCartItems
-                    updateCartTotals()
+            if (itemIndex != -1) {
+                val existingItem = currentCartItems[itemIndex]
+                if (existingItem.quantity > 1) {
+                    currentCartItems[itemIndex] = existingItem.copy(quantity = existingItem.quantity - 1)
+                } else {
+                    currentCartItems.removeAt(itemIndex)
                 }
-            } catch (e: Exception) {
-                println("Error removing from cart: ${e.message}")
+
+                _cartItems.value = currentCartItems
+                updateCartTotals()
             }
         }
     }
 
     fun removeItemCompletely(menuItemId: String) {
         viewModelScope.launch {
-            try {
-                val currentCartItems = _cartItems.value.toMutableList()
-                val itemIndex = currentCartItems.indexOfFirst { it.menuItem.id == menuItemId }
+            val currentCartItems = _cartItems.value.toMutableList()
+            val itemIndex = currentCartItems.indexOfFirst { it.menuItem.id == menuItemId }
 
-                if (itemIndex != -1) {
-                    currentCartItems.removeAt(itemIndex)
-                    _cartItems.value = currentCartItems
-                    updateCartTotals()
-                }
-            } catch (e: Exception) {
-                println("Error removing item completely: ${e.message}")
+            if (itemIndex != -1) {
+                currentCartItems.removeAt(itemIndex)
+                _cartItems.value = currentCartItems
+                updateCartTotals()
             }
         }
     }
 
     fun clearCart() {
         viewModelScope.launch {
-            try {
-                _cartItems.value = emptyList()
-                updateCartTotals()
-            } catch (e: Exception) {
-                println("Error clearing cart: ${e.message}")
-            }
+            _cartItems.value = emptyList()
+            updateCartTotals()
         }
     }
 
@@ -154,15 +134,9 @@ class MenuViewModel @Inject constructor(
     }
 
     private fun updateCartTotals() {
-        try {
-            val items = _cartItems.value
-            _totalCartPrice.value = items.sumOf { it.menuItem.price * it.quantity }
-            _cartItemCount.value = items.sumOf { it.quantity }
-        } catch (e: Exception) {
-            println("Error updating cart totals: ${e.message}")
-            _totalCartPrice.value = 0
-            _cartItemCount.value = 0
-        }
+        val items = _cartItems.value
+        _totalCartPrice.value = items.sumOf { it.menuItem.price * it.quantity }
+        _cartItemCount.value = items.sumOf { it.quantity }
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
@@ -173,5 +147,4 @@ class MenuViewModel @Inject constructor(
         transactionViewModel.createTransaction(itemsToBuy, total)
         clearCart()
     }
-
 }
