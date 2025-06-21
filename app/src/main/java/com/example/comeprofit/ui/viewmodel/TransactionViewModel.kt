@@ -26,12 +26,18 @@ class TransactionViewModel @Inject constructor(
 
     @RequiresApi(Build.VERSION_CODES.O)
     fun createTransaction(items: List<CartItem>, totalPrice: Int) {
+        val now = LocalDateTime.now()
+        val formatter = java.time.format.DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss")
+        val formattedDate = now.format(formatter)
+        val transactionId = "trx-$formattedDate"
+
         val transaction = Transaction(
-            id = UUID.randomUUID().toString(),
+            id = transactionId,
             items = items,
             totalPrice = totalPrice,
-            dateTime = LocalDateTime.now()
+            dateTime = now
         )
+
         viewModelScope.launch {
             repository.addTransaction(transaction)
         }
